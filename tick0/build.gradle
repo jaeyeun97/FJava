@@ -1,0 +1,26 @@
+apply plugin: 'java'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+    test {
+        java {
+            srcDir 'test/java'
+        }
+        resources {
+            srcDir 'test/res'
+        }
+    }
+}
+
+jar {
+	manifest {
+		attributes (
+			'Main-Class': 'uk.ac.cam.jyy24.fjava.tick0.ExternalSort'
+		)
+	}
+}
+
