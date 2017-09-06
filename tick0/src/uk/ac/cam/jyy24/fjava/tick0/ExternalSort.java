@@ -161,3 +161,41 @@ public class ExternalSort {
 		System.out.println("The checksum is: "+checkSum(f1));
 	}
 }
+
+class InputStreamBuffer <T extends InputStream> {
+	private static final int BUF_SIZE = 8192;
+
+	Integer last;
+	long length;
+	long counter = 0;
+	DataInputStream inputStream;
+
+	public InputStreamBuffer (T stream, long length) {
+		this.inputStream = new DataInputStream(new BufferedInputStream(stream, BUF_SIZE));
+		this.length = length;
+	}
+
+	public InputStreamBuffer (T stream, long offset, long length) throws IOException {
+	    this(stream, length);
+		inputStream.skip(offset);
+	}
+
+	public int peek() throws IOException, OutOfBoundsException {
+		counter++;
+		if(counter >= length)
+			throw new OutOfBoundsException();
+	    if(this.last == null){
+	    	last = inputStream.readInt();
+		}
+		return last;
+	}
+	public int pop() throws IOException, OutOfBoundsException {
+		 int result = peek();
+		 this.last = inputStream.readInt();
+		 return result;
+	}
+}
+
+class OutOfBoundsException extends Exception {
+
+}
