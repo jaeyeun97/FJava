@@ -24,3 +24,12 @@ jar {
 	}
 }
 
+task publishJar (type: Copy) {
+    from jar
+    into "$rootDir/jar"
+    rename { fileName -> "jyy24-$fileName"}
+}
+
+processTestResources {
+    from zipTree('test/res/test-suite.zip')
+}
