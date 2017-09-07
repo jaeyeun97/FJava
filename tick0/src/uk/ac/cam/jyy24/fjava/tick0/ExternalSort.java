@@ -87,19 +87,13 @@ public class ExternalSort {
 			}
 			while (!q.isEmpty()){
 				InputStreamBuffer isb = q.poll();
+				outputStream.writeInt(isb.pop());
 				if(!isb.done()){
-					outputStream.writeInt(isb.pop());
 					q.add(isb);
 				} else {
 					isb.close();
 				}
 			}
-		}
-	}
-
-	public static void writeArray(DataOutputStream outputStream, int[] arr) throws IOException {
-		for(int i = 0; i < arr.length; i++){
-		    outputStream.writeInt(arr[i]);
 		}
 	}
 
