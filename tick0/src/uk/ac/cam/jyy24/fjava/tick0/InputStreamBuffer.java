@@ -12,22 +12,27 @@ class InputStreamBuffer {
 
 	public InputStreamBuffer (String path, long offset, long length) throws IOException {
 	    RandomAccessFile file = new RandomAccessFile(path, "r");
-		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),BUF_SIZE));
-		this.length = length;
+	    int bufSize = (length < BUF_SIZE)? (int) length: BUF_SIZE;
+		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),bufSize));
 		inputStream.skip(offset);
-		this.last = inputStream.readInt();
-		counter+=4;
+		this.length = length;
+		if(this.length > 0) {
+			this.last = inputStream.readInt();
+			counter+=4;
+		}
 	}
 
-	public int peek() throws IOException {
+	public int peek() {
 		return last;
 	}
 	public int pop() throws IOException {
-	    if (counter > length)
+		if (counter > length) {
 			throw new OutOfBoundsException();
+		}
 		int result = peek();
-		if(counter < length)
+		if (counter < length) {
 			this.last = inputStream.readInt();
+		}
 		counter+=4;
 		return result;
 	}
