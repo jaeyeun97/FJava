@@ -3,7 +3,7 @@ package uk.ac.cam.jyy24.fjava.tick0;
 import java.io.*;
 
 class InputStreamBuffer {
-	private static final int BUF_SIZE = 32784;
+	private static final int BUF_SIZE = 32768;
 
 	private Integer last;
 	private long length;
@@ -12,13 +12,16 @@ class InputStreamBuffer {
 
 	public InputStreamBuffer (String path, long offset, long length) throws IOException {
 	    RandomAccessFile file = new RandomAccessFile(path, "r");
-	    int bufSize = (length < BUF_SIZE)? (int) length: BUF_SIZE;
-		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),bufSize));
-		inputStream.skip(offset);
+	    int bufSize = (length < BUF_SIZE)? (int) length : BUF_SIZE;
+
 		this.length = length;
-		if(this.length > 0) {
-			this.last = inputStream.readInt();
-			counter+=4;
+
+		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),bufSize));
+		this.counter = 0;
+
+		inputStream.skip(offset);
+		if(length > 0) {
+			this.last = read();
 		}
 	}
 
@@ -29,21 +32,35 @@ class InputStreamBuffer {
 		if (counter > length) {
 			throw new OutOfBoundsException();
 		}
-		int result = peek();
 		if (counter < length) {
-			this.last = inputStream.readInt();
+			int result = peek();
+			this.last = read();
+			return result;
+		} else if (counter == length){
+			counter+=4;
+			return this.last;
+		} else {
+			throw new OutOfBoundsException();
 		}
-		counter+=4;
-		return result;
 	}
 
 	public void close() throws IOException {
 		inputStream.close();
 	}
 
+	private int read() throws IOException {
+		int result = inputStream.readInt();
+		counter += 4;
+		return result;
+	}
+
 	public boolean done() {
 		return this.counter > this.length;
 	}
+
+	/*public int compareTo(InputStreamBuffer isb){
+		return Integer.compare(this.peek(), isb.peek());
+	}*/
 
 	public static int getBufSize() {
 		return BUF_SIZE;

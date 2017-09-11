@@ -18,14 +18,18 @@ public class ExternalSort {
 		File output = new File(f2);
 		File a = input;
 		long length = a.length();
-		// long blockSize = BUF_SIZE / BLOCK_NUM;
-		long blockSize = 4;
+		long blockSize = BUF_SIZE / BLOCK_NUM;
+		// long blockSize = 4;
 
-		while(blockSize <= length){
+		while(true){
 			long offset = 0;
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output), BUF_SIZE));
 			while (offset < length) {
-				mergeSort(input, outputStream, blockSize, offset);
+				if(blockSize * BLOCK_NUM <= BUF_SIZE){
+					quickSort(input, outputStream, (int) (blockSize*BLOCK_NUM), offset);
+				} else {
+					mergeSort(input, outputStream, blockSize, offset);
+				}
 				offset += BLOCK_NUM * blockSize;
 			}
 			outputStream.flush();
@@ -35,6 +39,8 @@ public class ExternalSort {
 				File tmp = output;
 				output = input;
 				input = tmp;
+			} else {
+				break;
 			}
 		}
 		if (!a.equals(output)){
@@ -63,23 +69,26 @@ public class ExternalSort {
 	}
 
 	private static void mergeSort(File input, DataOutputStream outputStream, long blockSize, long offset) throws IOException {
-		PriorityQueue<InputStreamBuffer> q = new PriorityQueue<>(BLOCK_NUM, (isb1, isb2) -> (isb1.peek() - isb2.peek()));
+		PriorityQueue<InputStreamBuffer> q = new PriorityQueue<>(BLOCK_NUM, (isb1, isb2) -> (Integer.compare(isb1.peek(), isb2.peek())));
+		long len = input.length();
+		long blockOffset = offset;
 
 		for(int i = 0; i < BLOCK_NUM; i++){
-			long blockOffset = i * blockSize + offset;
-			long len = input.length();
+		    InputStreamBuffer isb = null;
 			if(blockOffset < len){
 				if(len - blockOffset < blockSize){
-					q.add(new InputStreamBuffer(input.getPath(), blockOffset, len - blockOffset));
+					isb = new InputStreamBuffer(input.getPath(), blockOffset, len - blockOffset);
 				} else {
-					q.add(new InputStreamBuffer(input.getPath(), blockOffset, blockSize));
+					isb = new InputStreamBuffer(input.getPath(), blockOffset, blockSize);
 				}
+				q.offer(isb);
+				blockOffset += blockSize;
 			}
 		}
 		while (!q.isEmpty()){
 			InputStreamBuffer isb = q.poll();
+			outputStream.writeInt(isb.pop());
 			if(!isb.done()){
-				outputStream.writeInt(isb.pop());
 				q.add(isb);
 			} else {
 				isb.close();
