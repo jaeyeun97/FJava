@@ -3,7 +3,7 @@ package uk.ac.cam.jyy24.fjava.tick0;
 import java.io.*;
 
 class InputStreamBuffer {
-	private static final int BUF_SIZE = 32768;
+	private static final int BUF_SIZE = 131072; // 65536;
 
 	private Integer last;
 	private long length;

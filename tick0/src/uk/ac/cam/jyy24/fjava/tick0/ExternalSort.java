@@ -9,30 +9,29 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class ExternalSort {
-	private static final int BLOCK_NUM = 16;
+	private static final int BLOCK_NUM = 512;
 	private static final int BUF_SIZE = InputStreamBuffer.getBufSize();
-
+	private static final long QUICKSORT_BLOCK_SIZE = 2097152;
 
 	public static void sort(String f1, String f2) throws IOException {
 		File input = new File(f1);
 		File output = new File(f2);
 		File a = input;
 		long length = a.length();
-		long blockSize = BUF_SIZE / BLOCK_NUM;
+		long blockSize = QUICKSORT_BLOCK_SIZE / BLOCK_NUM;
 		// long blockSize = 4;
 
 		while(true){
 			long offset = 0;
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output), BUF_SIZE));
 			while (offset < length) {
-				if(blockSize * BLOCK_NUM <= BUF_SIZE){
-					quickSort(input, outputStream, (int) (blockSize*BLOCK_NUM), offset);
+				if(blockSize * BLOCK_NUM <= QUICKSORT_BLOCK_SIZE){
+					quickSort(input, outputStream, (int) blockSize * BLOCK_NUM, offset);
 				} else {
 					mergeSort(input, outputStream, blockSize, offset);
 				}
 				offset += BLOCK_NUM * blockSize;
 			}
-			outputStream.flush();
 			outputStream.close();
 			blockSize *= BLOCK_NUM;
 			if(blockSize < length) {

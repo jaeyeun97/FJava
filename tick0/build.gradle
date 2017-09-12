@@ -22,6 +22,7 @@ jar {
 			'Main-Class': 'uk.ac.cam.jyy24.fjava.tick0.ExternalSort'
 		)
 	}
+    from sourceSets.main.allSource
 }
 
 task publishJar (type: Copy) {
@@ -32,4 +33,8 @@ task publishJar (type: Copy) {
 
 processTestResources {
     from zipTree('test/res/test-suite.zip')
+}
+
+test {
+    maxHeapSize = '10m'
 }
