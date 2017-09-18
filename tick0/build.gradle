@@ -38,3 +38,8 @@ processTestResources {
 test {
     maxHeapSize = '10m'
 }
+
+build {
+    dependsOn publishJar
+    publishJar.shouldRunAfter check
+}

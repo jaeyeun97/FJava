@@ -24,6 +24,7 @@ public class ExternalSort {
 		while(true){
 			long offset = 0;
 			DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(output), BUF_SIZE));
+			long startingTime = System.currentTimeMillis();
 			while (offset < length) {
 				if(blockSize * BLOCK_NUM <= QUICKSORT_BLOCK_SIZE){
 					quickSort(input, outputStream, (int) blockSize * BLOCK_NUM, offset);
@@ -33,6 +34,8 @@ public class ExternalSort {
 				offset += BLOCK_NUM * blockSize;
 			}
 			outputStream.close();
+			long endingTime = System.currentTimeMillis();
+			System.out.println("Time taken to run:" + (endingTime-startingTime) + "ms");
 			blockSize *= BLOCK_NUM;
 			if(blockSize < length) {
 				File tmp = output;
@@ -52,15 +55,16 @@ public class ExternalSort {
 	   	InputStreamBuffer isb;
 	   	int[] arr;
 		if(size < blockSize){
-			isb = new InputStreamBuffer(input.getPath(), offset, size);
+			isb = new InputStreamBuffer(input.getPath(), offset, size, blockSize);
 			arr = new int[(int) (size/4)];
 		} else {
-			isb = new InputStreamBuffer(input.getPath(), offset, blockSize);
+			isb = new InputStreamBuffer(input.getPath(), offset, blockSize, blockSize);
 			arr = new int[blockSize/4];
 		}
 		for(int i = 0; i < arr.length; i++){
 			arr[i] = isb.pop();
 		}
+		isb.close();
 		Arrays.sort(arr);
 		for(int i = 0; i < arr.length; i++){
 			outputStream.writeInt(arr[i]);

@@ -3,7 +3,7 @@ package uk.ac.cam.jyy24.fjava.tick0;
 import java.io.*;
 
 class InputStreamBuffer {
-	private static final int BUF_SIZE = 131072; // 65536;
+	private static final int BUF_SIZE = 262144;
 
 	private Integer last;
 	private long length;
@@ -16,6 +16,18 @@ class InputStreamBuffer {
 
 		this.length = length;
 
+		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),bufSize));
+		this.counter = 0;
+
+		inputStream.skip(offset);
+		if(length > 0) {
+			this.last = read();
+		}
+	}
+	public InputStreamBuffer (String path, long offset, long length, int bufSize) throws IOException {
+	    RandomAccessFile file = new RandomAccessFile(path, "r");
+
+		this.length = length;
 		this.inputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getFD()),bufSize));
 		this.counter = 0;
 
