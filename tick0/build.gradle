@@ -1,5 +1,8 @@
 apply plugin: 'java'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 sourceSets {
     main {
         java {
@@ -37,6 +40,7 @@ processTestResources {
 
 test {
     maxHeapSize = '10m'
+    testLogging.showStandardStreams = true
 }
 
 build {

@@ -33,12 +33,19 @@ public class ExternalSortTest {
 
     @Test
     public void test() throws IOException {
+        long time = 0;
         for(int key: checksums.keySet()){
             String f1 = this.path.resolve(String.format("test%da.dat", key)).toString();
             String f2 = this.path.resolve(String.format("test%db.dat", key)).toString();
+            long startingTime = System.nanoTime();
             ExternalSort.sort(f1, f2);
+            long endingTime = System.nanoTime();
+            long t = endingTime-startingTime;
+            System.out.println("Time taken to run test " + key + ": " + t + "ns");
+            time += t;
             String actual = ExternalSort.checkSum(f1);
             assertEquals(String.format("Error in checksum for File Set %d", key), checksums.get(key), actual);
         }
+        System.out.println("Total Time: " + time + "ns");
     }
 }
